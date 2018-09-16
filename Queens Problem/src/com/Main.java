@@ -1,10 +1,12 @@
 package com;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
-    static List<Node<Board>> solutions;
+    static Set<Node<Board>> solutions;
 
     public static void attachEveryNextState(Node<Board> root){
         int size = root.getData().getSize();
@@ -26,40 +28,33 @@ public class Main {
     }
 
     static void recursiveFill(Node<Board> root){
-        attachEveryNextState(root);
-        for (Node n : root.getChildren()) {
-            recursiveFill(n);
+        if (root.getData().getQueensCount() >= 8) {
+            return;
         }
-    }
-
-    static void nonRecursiveFill(Node<Board> root){
         attachEveryNextState(root);
-        System.out.println("Finished second level...");
-
-        for (Node<Board> n : root.getChildren())
-            attachEveryNextState(n);
-        System.out.println("Finished second level...");
-
-        for (Node<Board> n : root.getChildren())
-            for (Node<Board> j : n.getChildren())
-                attachEveryNextState(j);
-        System.out.println("Finished third level...");
+        for (Node<Board> n : root.getChildren()) {
+            if (n.getData().getQueensCount() < 8) {
+                recursiveFill(n);
+            }
+            else
+                System.out.println(n.getData().getFormattedBoard());
+        }
     }
 
     public static void main(String[] args){
         float startTime = 0, finishTime = 0;
         startTime = System.nanoTime();
-        solutions = new ArrayList<>();
+        solutions = new HashSet<>();
         Board board = new Board(8);
         Node<Board> root = new Node<>(board);
         System.out.println("Calculating every state...");
-        //recursiveFill(root);
-        nonRecursiveFill(root);
+        recursiveFill(root);
+        finishTime = System.nanoTime();
+        System.out.printf("Time: %.0f%n", (finishTime-startTime) );// / 1000000000);
+
         for (Node<Board> n : solutions) {
             System.out.println(n.getData().getFormattedBoard());
             System.out.println();
         }
-        finishTime = System.nanoTime();
-        System.out.printf("Time: %.0f%n", (finishTime-startTime) );/// 1000000000);
      }
 }
